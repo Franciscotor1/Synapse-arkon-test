@@ -1,0 +1,17 @@
+{
+	"name": "workers_fullname_dwh",
+	"properties": {
+		"content": {
+			"query": "IF EXISTS (\n    SELECT 1 FROM sys.external_tables WHERE name = 'workers_by_fullname'\n)\nBEGIN\n    DROP EXTERNAL TABLE workers_by_fullname;\nEND\nGO\n\n-- Ahora sí, crear la tabla\nCREATE EXTERNAL TABLE workers_by_fullname (\n    full_name VARCHAR(255),\n    company_name VARCHAR(255),\n    address VARCHAR(255),\n    city VARCHAR(100),\n    county VARCHAR(100),\n    state CHAR(2),\n    zip INT,\n    phone1 VARCHAR(20),\n    phone2 VARCHAR(20),\n    email VARCHAR(255),\n    web VARCHAR(255)\n)\nWITH (\n    LOCATION = 'silver_layer/workers_by_fullname.parquet',\n    DATA_SOURCE = blob_storage,\n    FILE_FORMAT = ParquetFormat\n);\nGO\n\nSELECT TOP 10 * FROM workers_by_fullname;\n\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "sql_relational_dwh",
+				"poolName": "sql_relational_dwh"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

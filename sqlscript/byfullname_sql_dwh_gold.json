@@ -1,0 +1,17 @@
+{
+	"name": "byfullname_sql_dwh_gold",
+	"properties": {
+		"content": {
+			"query": "SELECT TOP 100 * FROM dbo.sql_byfullname_dwh_gold\nGo",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "sql_relational_dwh",
+				"poolName": "sql_relational_dwh"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"name": "load_data_raw_parquet",
+	"properties": {
+		"content": {
+			"query": "SELECT TOP 100 * FROM dbo.sql_workers_raw_parquet\nGo",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "sql_relational_dwh",
+				"poolName": "sql_relational_dwh"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

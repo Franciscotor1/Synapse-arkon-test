@@ -1,0 +1,465 @@
+{
+	"name": "silver_layer_parquet",
+	"properties": {
+		"folder": {
+			"name": "Silver_scripts"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "arkonpool",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "1d57d59d-522b-4deb-a235-9d8a9e78eea0"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/242239df-ca9e-439a-b560-2b82454d87ff/resourceGroups/arkon-gr/providers/Microsoft.Synapse/workspaces/ws-synapse-arkon/bigDataPools/arkonpool",
+				"name": "arkonpool",
+				"type": "Spark",
+				"endpoint": "https://ws-synapse-arkon.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/arkonpool",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 15
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# EXTRACCIÓN E INGESTA\n",
+					"# 1.- Transformación a parquet\n",
+					"# 2.- Guardar en capa Silver"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"# 1. Leer datos desde blob storage (ajusta la ruta según tu caso)\n",
+					"input_path = \"abfss://bronce@blobstoragearkon.dfs.core.windows.net/Raw/datrip_raw.csv\"\n",
+					"\n",
+					"# Lee el archivo CSV\n",
+					"df = spark.read.format(\"csv\") \\\n",
+					"    .option(\"header\", \"true\") \\\n",
+					"    .option(\"inferSchema\", \"true\") \\\n",
+					"    .load(input_path)\n",
+					"\n",
+					"# 2. Mostrar solo las primeras 20 filas (versión visual)\n",
+					"print(\"Mostrando las primeras 20 filas:\")\n",
+					"display(df.limit(20))\n",
+					"\n",
+					"# 3. Guardar el DataFrame como Parquet\n",
+					"output_path = \"abfss://silver@blobstoragearkon.dfs.core.windows.net/silver_layer/workers_cleaning.parquet\"\n",
+					"\n",
+					"df.write \\\n",
+					"  .mode(\"overwrite\") \\\n",
+					"  .parquet(output_path)\n",
+					"\n",
+					"print(f\"Archivo guardado exitosamente en: {output_path}\")"
+				],
+				"execution_count": 48
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"# Leer el archivo Parquet recién guardado\n",
+					"df_read_back = spark.read.parquet(output_path)\n",
+					"\n",
+					"# Mostrar los primeros registros\n",
+					"print(\"Datos guardados:\")\n",
+					"display(df_read_back.limit(5))"
+				],
+				"execution_count": 49
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"# 1. Ruta del archivo original\n",
+					"input_path = \"abfss://silver@blobstoragearkon.dfs.core.windows.net/silver_layer/workers_cleaning.parquet\"\n",
+					"\n",
+					"# 2. Leer el DataFrame desde Parquet\n",
+					"df = spark.read.parquet(input_path)\n",
+					"\n",
+					"# 3. Crear full_name\n",
+					"from pyspark.sql.functions import col, concat, lit\n",
+					"\n",
+					"df = df.withColumn(\"full_name\", concat(col(\"first_name\"), lit(\" \"), col(\"last_name\")))\n",
+					"\n",
+					"# 4. Reordenar las columnas para que 'full_name' esté primero\n",
+					"columns = [\"full_name\"] + [col_name for col_name in df.columns if col_name not in [\"full_name\", \"first_name\", \"last_name\"]]\n",
+					"\n",
+					"df_reordered = df.select(columns)\n",
+					"\n",
+					"# 5. Eliminar first_name y last_name (ya no son necesarias)\n",
+					"df_final = df_reordered.drop(\"first_name\", \"last_name\")\n",
+					"\n",
+					"# 6. Mostrar los primeros registros\n",
+					"print(\"Datos con full_name al inicio:\")\n",
+					"display(df_final.limit(5))\n",
+					"\n",
+					"# 7. Guardar como nuevo archivo Parquet\n",
+					"output_path = \"abfss://silver@blobstoragearkon.dfs.core.windows.net/silver_layer/workers_by_fullname.parquet\"\n",
+					"\n",
+					"df_final.write \\\n",
+					"    .mode(\"overwrite\") \\\n",
+					"    .parquet(output_path)\n",
+					"\n",
+					"print(f\"\\nArchivo guardado exitosamente en: {output_path}\")"
+				],
+				"execution_count": 50
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Guardar en Gold"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Ruta en gold (directamente en la raíz)\n",
+					"gold_output_path = \"abfss://gold@blobstoragearkon.dfs.core.windows.net/gold_layer/workers_by_fullname.parquet\"\n",
+					"\n",
+					"# Guardar en gold\n",
+					"df_final.write \\\n",
+					"    .mode(\"overwrite\") \\\n",
+					"    .parquet(gold_output_path)\n",
+					"\n",
+					"print(f\"✅ Archivo guardado exitosamente en el contenedor gold: {gold_output_path}\")"
+				],
+				"execution_count": 51
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Partición (Opcional)"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# 1. Ruta del archivo original\n",
+					"input_path = \"abfss://silver@blobstoragearkon.dfs.core.windows.net/silver_layer/workers_by_fullname.parquet\"\n",
+					"\n",
+					"# 2. Leer el DataFrame desde Parquet\n",
+					"df = spark.read.parquet(input_path)\n",
+					"\n",
+					"# 3. Asegurarnos que las columnas city, county y state existen\n",
+					"from pyspark.sql.functions import col\n",
+					"\n",
+					"df_clean = df.select(\n",
+					"    col(\"full_name\"),\n",
+					"    col(\"city\"),\n",
+					"    col(\"county\"),\n",
+					"    col(\"state\"),\n",
+					"    col(\"company_name\"),\n",
+					"    col(\"address\"),\n",
+					"    col(\"zip\"),\n",
+					"    col(\"phone1\"),\n",
+					"    col(\"phone2\"),\n",
+					"    col(\"email\"),\n",
+					"    col(\"web\")\n",
+					")\n",
+					"\n",
+					"# 4. Reordenamos para tener city, county, state al inicio\n",
+					"df_reordered = df_clean.select(\"city\", \"county\", \"state\", *[col for col in df_clean.columns if col not in [\"city\", \"county\", \"state\"]])\n",
+					"\n",
+					"# 5. Definimos la ruta destino\n",
+					"output_path = \"abfss://silver@blobstoragearkon.dfs.core.windows.net/silver_layer/by_cities/\"\n",
+					"\n",
+					"# 6. Escribimos particionando por city, county, state\n",
+					"df_reordered.write \\\n",
+					"    .partitionBy(\"city\", \"county\", \"state\") \\\n",
+					"    .mode(\"overwrite\") \\\n",
+					"    .parquet(output_path)\n",
+					"\n",
+					"print(f\"\\nDatos particionados y guardados exitosamente en: {output_path}\")"
+				],
+				"execution_count": 52
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Consulta de uno de los archivos particionados (Silver)\n",
+					"Lo que se hizo fue separar la data por ciudad, condado y estado."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"city_to_read = \"Abilene\"\n",
+					"path_to_read = f\"abfss://silver@blobstoragearkon.dfs.core.windows.net/silver_layer/by_cities/city={city_to_read}\"\n",
+					"\n",
+					"# Leer el parquet\n",
+					"df_city = spark.read.parquet(path_to_read)\n",
+					"\n",
+					"# Recuperar la ciudad del path como columna\n",
+					"from pyspark.sql.functions import lit\n",
+					"\n",
+					"df_city_with_name = df_city.withColumn(\"city\", lit(city_to_read))\n",
+					"\n",
+					"# Mostrar resultados\n",
+					"display(df_city_with_name)"
+				],
+				"execution_count": 53
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Eliminación de errores de duplicado"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"# 1. Ruta de entrada y salida\n",
+					"input_path = \"abfss://silver@blobstoragearkon.dfs.core.windows.net/silver_layer/by_cities/\"\n",
+					"output_path = \"abfss://silver@blobstoragearkon.dfs.core.windows.net/silver_layer/by_cities_cleaned/\"\n",
+					"\n",
+					"# 2. Leer todos los archivos parquet (incluyendo todas las particiones)\n",
+					"df = spark.read.parquet(input_path)\n",
+					"\n",
+					"# 3. Eliminar filas duplicadas completamente iguales\n",
+					"df_deduplicated = df.dropDuplicates()\n",
+					"\n",
+					"# 4. Mostrar algunos registros después de eliminar duplicados (opcional)\n",
+					"print(\"Datos después de eliminar duplicados:\")\n",
+					"display(df_deduplicated.limit(5))\n",
+					"\n",
+					"# 5. Guardar los datos limpios particionados por city, county y state\n",
+					"df_deduplicated.write \\\n",
+					"    .partitionBy(\"city\", \"county\", \"state\") \\\n",
+					"    .mode(\"overwrite\") \\\n",
+					"    .parquet(output_path)\n",
+					"\n",
+					"print(f\"\\nDatos limpios y guardados exitosamente en: {output_path}\")"
+				],
+				"execution_count": 54
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Hacer conteo de trabajadores de compañias por ciudad"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"# 1. Ruta del directorio limpio\n",
+					"cleaned_path = \"abfss://silver@blobstoragearkon.dfs.core.windows.net/silver_layer/by_cities_cleaned/\"\n",
+					"\n",
+					"# 2. Leer todos los archivos parquet\n",
+					"df_cleaned = spark.read.parquet(cleaned_path)\n",
+					"\n",
+					"# 3. Agrupar por ciudad y contar registros\n",
+					"from pyspark.sql.functions import count\n",
+					"\n",
+					"df_by_city = df_cleaned.groupBy(\"city\", \"county\", \"state\").agg(count(\"*\").alias(\"total_personas\"))\n",
+					"\n",
+					"# 4. Mostrar resultados\n",
+					"print(\"\\nCantidad de personas por ciudad:\")\n",
+					"display(df_by_city.orderBy(\"total_personas\", ascending=False))"
+				],
+				"execution_count": 55
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Dataframe de registros de New York"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"# 1. Ruta del directorio limpio\n",
+					"cleaned_path = \"abfss://silver@blobstoragearkon.dfs.core.windows.net/silver_layer/by_cities_cleaned/\"\n",
+					"\n",
+					"# 2. Leer todos los archivos parquet\n",
+					"df_cleaned = spark.read.parquet(cleaned_path)\n",
+					"\n",
+					"# 3. Filtrar por ciudad = 'New York'\n",
+					"df_ny = df_cleaned.filter(df_cleaned.city == \"New York\")\n",
+					"\n",
+					"# 4. Mostrar algunos registros\n",
+					"print(\"\\nRegistros de New York:\")\n",
+					"display(df_ny.limit(5))\n",
+					"\n",
+					"# 5. Contar total de registros de New York\n",
+					"total_ny = df_ny.count()\n",
+					"print(f\"\\nTotal de registros de New York: {total_ny}\")"
+				],
+				"execution_count": 56
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# 1.- Separación de ciudades grandes.\n",
+					"# 2.- Guardado en la capa Gold"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"# 1. Ruta base de los datos limpios (silver)\n",
+					"cleaned_path = \"abfss://silver@blobstoragearkon.dfs.core.windows.net/silver_layer/by_cities_cleaned/\"\n",
+					"\n",
+					"# 2. Leer todos los archivos Parquet\n",
+					"df_cleaned = spark.read.parquet(cleaned_path)\n",
+					"\n",
+					"# 3. Definir las ciudades más grandes de EE.UU.\n",
+					"big_cities = [\n",
+					"    \"New York\", \"Los Angeles\", \"Chicago\", \"Houston\",\n",
+					"    \"Phoenix\", \"Philadelphia\", \"San Antonio\", \"San Diego\",\n",
+					"    \"Dallas\", \"San Jose\"\n",
+					"]\n",
+					"\n",
+					"# 4. Filtrar DataFrame para incluir solo esas ciudades\n",
+					"df_big_cities = df_cleaned.filter(df_cleaned.city.isin(big_cities))\n",
+					"\n",
+					"# 5. Mostrar algunos registros para validar (opcional)\n",
+					"print(\"\\nMostrando muestra de datos:\")\n",
+					"display(df_big_cities.limit(10))\n",
+					"\n",
+					"# 6. Contar total de registros\n",
+					"total_records = df_big_cities.count()\n",
+					"print(f\"\\nTotal de registros de ciudades grandes: {total_records}\")\n",
+					"\n",
+					"# 7. Carpeta destino en gold (única carpeta para todas las ciudades)\n",
+					"output_path = \"abfss://gold@blobstoragearkon.dfs.core.windows.net/gold_layer/all_big_cities.parquet\"\n",
+					"\n",
+					"# 8. Guardar como UN SOLO ARCHIVO PARQUET\n",
+					"df_big_cities.coalesce(1).write \\\n",
+					"    .mode(\"overwrite\") \\\n",
+					"    .parquet(output_path)\n",
+					"\n",
+					"print(f\"\\nDatos de todas las ciudades grandes guardados en: {output_path}\")"
+				],
+				"execution_count": 57
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					""
+				]
+			}
+		]
+	}
+}

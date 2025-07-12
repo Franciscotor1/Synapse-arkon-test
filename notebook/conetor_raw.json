@@ -1,0 +1,80 @@
+{
+	"name": "conetor_raw",
+	"properties": {
+		"folder": {
+			"name": "Raw_scripts"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "arkonpool",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "107edc8a-f3c9-4dd5-8320-dc0dbd4ba6b5"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/242239df-ca9e-439a-b560-2b82454d87ff/resourceGroups/arkon-gr/providers/Microsoft.Synapse/workspaces/ws-synapse-arkon/bigDataPools/arkonpool",
+				"name": "arkonpool",
+				"type": "Spark",
+				"endpoint": "https://ws-synapse-arkon.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/arkonpool",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"# 1. Definir la URL JDBC\n",
+					"jdbc_url = \"jdbc:sqlserver://ws-synapse-arkon.sql.azuresynapse.net:1433;databaseName=sql_relational_dwh;user=franadmin01@ws-synapse-arkon;password=Sql.01pacox;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.sql.azuresynapse.net;loginTimeout=30;\"\n",
+					"\n",
+					"# 2. Nombre de la tabla que quieres leer\n",
+					"table_name = \"dbo.sql_workers_raw\"\n",
+					"\n",
+					"# 3. Leer los datos desde el SQL Pool\n",
+					"df = spark.read \\\n",
+					"    .format(\"jdbc\") \\\n",
+					"    .option(\"url\", jdbc_url) \\\n",
+					"    .option(\"dbtable\", table_name) \\\n",
+					"    .option(\"driver\", \"com.microsoft.sqlserver.jdbc.SQLServerDriver\") \\\n",
+					"    .load()\n",
+					"\n",
+					"# 4. Mostrar los primeros registros usando display()\n",
+					"print(\"Primeras 20 filas:\")\n",
+					"display(df.limit(20))  # Muestra solo 5 filas con formato visual\n",
+					"\n",
+					"# 5. Mostrar el número total de filas\n",
+					"total_rows = df.count()\n",
+					"print(f\"\\nTotal de filas: {total_rows}\")"
+				]
+			}
+		]
+	}
+}

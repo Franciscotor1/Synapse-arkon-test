@@ -1,0 +1,138 @@
+{
+	"name": "arkon_external_activity_to_dwh",
+	"properties": {
+		"activities": [
+			{
+				"name": "Raw Extraction",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "Data extract",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "conetor_raw",
+						"type": "NotebookReference"
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "arkonpool",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"driverSize": "Small"
+				}
+			},
+			{
+				"name": "Silver transform to Gold dwh",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "Raw Extraction",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "silver_layer_parquet",
+						"type": "NotebookReference"
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "arkonpool",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"driverSize": "Small",
+					"authentication": {
+						"type": "MSI"
+					}
+				}
+			},
+			{
+				"name": "Data extract",
+				"type": "Script",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_synapse_conection",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "SELECT TOP 100 * FROM dbo.sql_workers_raw;"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "Gold External Tables",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Silver transform to Gold dwh",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_synapse_conection",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "NonQuery",
+							"text": "IF EXISTS (\n    SELECT 1 FROM sys.external_tables WHERE name = 'workers_by_fullname'\n)\nBEGIN\n    DROP EXTERNAL TABLE workers_by_fullname;\nEND;\n\n-- Crear tabla externa workers_by_fullname\nCREATE EXTERNAL TABLE workers_by_fullname (\n    full_name VARCHAR(255),\n    company_name VARCHAR(255),\n    address VARCHAR(255),\n    city VARCHAR(100),\n    county VARCHAR(100),\n    state CHAR(2),\n    zip INT,\n    phone1 VARCHAR(20),\n    phone2 VARCHAR(20),\n    email VARCHAR(255),\n    web VARCHAR(255)\n)\nWITH (\n    LOCATION = 'silver_layer/workers_by_fullname.parquet',\n    DATA_SOURCE = blob_storage,\n    FILE_FORMAT = ParquetFormat\n);\n"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2025-07-12T03:58:36Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}
