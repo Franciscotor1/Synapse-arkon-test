@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "ws-synapse-arkon"
+		},
+		"ws-synapse-arkon-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:ws-synapse-arkon.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"ls_synapse_conection_properties_typeProperties_server": {
+			"value": "ws-synapse-arkon.sql.azuresynapse.net"
+		},
+		"ls_synapse_conection_properties_typeProperties_database": {
+			"value": "sql_relational_dwh"
+		},
+		"ws-synapse-arkon-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://blobstoragearkon.dfs.core.windows.net"
+		}
+	}
+}
