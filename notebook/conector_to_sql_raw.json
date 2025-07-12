@@ -1,5 +1,5 @@
 {
-	"name": "conetor_raw",
+	"name": "conector_to_sql_raw",
 	"properties": {
 		"folder": {
 			"name": "Raw_scripts"
@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "da43b539-2d5c-4a8b-af27-095f12b5b4b6"
+				"spark.autotune.trackingId": "6297ac66-ee71-47ba-bd26-0605c87a78f5"
 			}
 		},
 		"metadata": {

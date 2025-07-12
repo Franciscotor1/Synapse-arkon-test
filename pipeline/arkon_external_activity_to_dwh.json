@@ -23,7 +23,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "conetor_raw",
+						"referenceName": "conector_to_sql_raw",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
@@ -32,7 +32,13 @@
 						"type": "BigDataPoolReference"
 					},
 					"executorSize": "Small",
-					"driverSize": "Small"
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"driverSize": "Small",
+					"numExecutors": null
 				}
 			},
 			{
@@ -65,7 +71,13 @@
 						"type": "BigDataPoolReference"
 					},
 					"executorSize": "Small",
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
 					"driverSize": "Small",
+					"numExecutors": null,
 					"authentication": {
 						"type": "MSI"
 					}
