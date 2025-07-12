@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6297ac66-ee71-47ba-bd26-0605c87a78f5"
+				"spark.autotune.trackingId": "18da2d08-1b4e-4e7f-9cdf-92372a253fb2"
 			}
 		},
 		"metadata": {
@@ -59,7 +59,7 @@
 					"mssparkutils.credentials.help()\n",
 					""
 				],
-				"execution_count": 17
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -77,7 +77,7 @@
 					"except Exception as e:\n",
 					"    raise RuntimeError(f\"❌ Error obteniendo el secreto '{secret_name}': {e}\")"
 				],
-				"execution_count": 18
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -96,7 +96,7 @@
 					"print(\"🔗 Cadena de conexión lista:\")\n",
 					"print(jdbc_url)"
 				],
-				"execution_count": 19
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -122,7 +122,51 @@
 					"total_rows = df.count()\n",
 					"print(f\"\\n🔢 Total de filas: {total_rows}\")"
 				],
-				"execution_count": 20
+				"execution_count": 4
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql import DataFrame\n",
+					"\n",
+					"# Convertir a Parquet (en memoria)\n",
+					"df_parquet = df  # El DataFrame ya está listo para usar como si fuera parquet\n",
+					"\n",
+					"# Opcional: Si quieres verificar el esquema o hacer operaciones encadenadas\n",
+					"df_parquet.cache()  # Lo mantienes en memoria si planeas reusarlo"
+				],
+				"execution_count": 6
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"total_rows = df_parquet.count()\n",
+					"print(f\"🔢 Total de filas: {total_rows}\")"
+				],
+				"execution_count": 7
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df_parquet.printSchema()"
+				],
+				"execution_count": 8
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.functions import col\n",
+					"\n",
+					"# Contar valores nulos por columna\n",
+					"null_counts = df_parquet.select(\n",
+					"    [col(c).isNull().cast(\"int\").alias(c) for c in df_parquet.columns]\n",
+					").first().asDict()\n",
+					"\n",
+					"print(\"❌ Valores nulos por columna:\")\n",
+					"for col_name, count in null_counts.items():\n",
+					"    print(f\"{col_name}: {count}\")"
+				],
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
