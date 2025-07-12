@@ -21,12 +21,16 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "107edc8a-f3c9-4dd5-8320-dc0dbd4ba6b5"
+				"spark.autotune.trackingId": "da43b539-2d5c-4a8b-af27-095f12b5b4b6"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
 			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
 			"language_info": {
 				"name": "python"
 			},
@@ -37,14 +41,13 @@
 				"endpoint": "https://ws-synapse-arkon.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/arkonpool",
 				"auth": {
 					"type": "AAD",
-					"authResource": "https://dev.azuresynapse.net",
-					"authHeader": null
+					"authResource": "https://dev.azuresynapse.net"
 				},
 				"sparkVersion": "3.4",
 				"nodeCount": 10,
 				"cores": 4,
 				"memory": 28,
-				"extraHeader": null
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -52,13 +55,59 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"# 1. Definir la URL JDBC\n",
-					"jdbc_url = \"jdbc:sqlserver://ws-synapse-arkon.sql.azuresynapse.net:1433;databaseName=sql_relational_dwh;user=franadmin01@ws-synapse-arkon;password=Sql.01pacox;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.sql.azuresynapse.net;loginTimeout=30;\"\n",
+					"from notebookutils import mssparkutils\n",
+					"mssparkutils.credentials.help()\n",
+					""
+				],
+				"execution_count": 17
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from notebookutils import mssparkutils\n",
 					"\n",
-					"# 2. Nombre de la tabla que quieres leer\n",
+					"# Nombre del Azure Key Vault y del secreto\n",
+					"akv_name = \"synapse-arkonkey\"\n",
+					"secret_name = \"synapse-arkonpassdb\"\n",
+					"\n",
+					"# Obtener la contraseña desde Azure Key Vault\n",
+					"try:\n",
+					"    db_password = mssparkutils.credentials.getSecret(akv_name, secret_name)\n",
+					"    print(\"✅ Contraseña obtenida desde Azure Key Vault\")\n",
+					"except Exception as e:\n",
+					"    raise RuntimeError(f\"❌ Error obteniendo el secreto '{secret_name}': {e}\")"
+				],
+				"execution_count": 18
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"jdbc_url = (\n",
+					"    f\"jdbc:sqlserver://ws-synapse-arkon.sql.azuresynapse.net:1433;\"\n",
+					"    f\"databaseName=sql_relational_dwh;\"\n",
+					"    f\"user=franadmin01@ws-synapse-arkon;\"\n",
+					"    f\"password={db_password};\"\n",
+					"    f\"encrypt=true;\"\n",
+					"    f\"trustServerCertificate=false;\"\n",
+					"    f\"hostNameInCertificate=*.sql.azuresynapse.net;\"\n",
+					"    f\"loginTimeout=30;\"\n",
+					")\n",
+					"\n",
+					"print(\"🔗 Cadena de conexión lista:\")\n",
+					"print(jdbc_url)"
+				],
+				"execution_count": 19
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"# Nombre de la tabla que quieres leer\n",
 					"table_name = \"dbo.sql_workers_raw\"\n",
 					"\n",
-					"# 3. Leer los datos desde el SQL Pool\n",
+					"# Leer los datos desde el SQL Pool\n",
 					"df = spark.read \\\n",
 					"    .format(\"jdbc\") \\\n",
 					"    .option(\"url\", jdbc_url) \\\n",
@@ -66,14 +115,21 @@
 					"    .option(\"driver\", \"com.microsoft.sqlserver.jdbc.SQLServerDriver\") \\\n",
 					"    .load()\n",
 					"\n",
-					"# 4. Mostrar los primeros registros usando display()\n",
-					"print(\"Primeras 20 filas:\")\n",
-					"display(df.limit(20))  # Muestra solo 5 filas con formato visual\n",
+					"# Mostrar resultados\n",
+					"print(\"📊 Primeras filas:\")\n",
+					"display(df.limit(20))\n",
 					"\n",
-					"# 5. Mostrar el número total de filas\n",
 					"total_rows = df.count()\n",
-					"print(f\"\\nTotal de filas: {total_rows}\")"
-				]
+					"print(f\"\\n🔢 Total de filas: {total_rows}\")"
+				],
+				"execution_count": 20
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					""
+				],
+				"execution_count": null
 			}
 		]
 	}
