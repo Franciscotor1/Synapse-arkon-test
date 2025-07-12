@@ -36,11 +36,11 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Raw Extraction",
+						"name": "Raw Extraction and df exploration",
 						"type": "SynapseNotebook",
 						"dependsOn": [
 							{
-								"activity": "Data extract",
+								"activity": "Copy into - bronce to SQL database",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -79,7 +79,7 @@
 						"type": "SynapseNotebook",
 						"dependsOn": [
 							{
-								"activity": "Raw Extraction",
+								"activity": "Raw Extraction and df exploration",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -117,7 +117,7 @@
 						}
 					},
 					{
-						"name": "Data extract",
+						"name": "Copy into - bronce to SQL database",
 						"type": "Script",
 						"dependsOn": [],
 						"policy": {
@@ -147,7 +147,7 @@
 						"type": "Script",
 						"dependsOn": [
 							{
-								"activity": "Silver transform to Gold dwh",
+								"activity": "Gold data to dwh and sql",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -170,6 +170,39 @@
 								{
 									"type": "NonQuery",
 									"text": "IF EXISTS (\n    SELECT 1 FROM sys.external_tables WHERE name = 'workers_by_fullname'\n)\nBEGIN\n    DROP EXTERNAL TABLE workers_by_fullname;\nEND;\n\n-- Crear tabla externa workers_by_fullname\nCREATE EXTERNAL TABLE workers_by_fullname (\n    full_name VARCHAR(255),\n    company_name VARCHAR(255),\n    address VARCHAR(255),\n    city VARCHAR(100),\n    county VARCHAR(100),\n    state CHAR(2),\n    zip INT,\n    phone1 VARCHAR(20),\n    phone2 VARCHAR(20),\n    email VARCHAR(255),\n    web VARCHAR(255)\n)\nWITH (\n    LOCATION = 'silver_layer/workers_by_fullname.parquet',\n    DATA_SOURCE = blob_storage,\n    FILE_FORMAT = ParquetFormat\n);\n"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "Gold data to dwh and sql",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "Silver transform to Gold dwh",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "ls_synapse_conection",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "SELECT TOP 100 * FROM dbo.sql_bigcities_dwh_gold;\n\nSELECT TOP 100 * FROM dbo.sql_byfullname_dwh_gold;\n\n"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -427,7 +460,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "ba379314-bb3a-4366-a900-f03a7f2eaac9"
+						"spark.autotune.trackingId": "8715fd4e-fc75-4d18-9150-375db83095ae"
 					}
 				},
 				"metadata": {
@@ -452,15 +485,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from notebookutils import mssparkutils\n",
 							"mssparkutils.credentials.help()\n",
@@ -471,7 +502,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from notebookutils import mssparkutils\n",
 							"\n",
@@ -491,7 +521,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"jdbc_url = (\n",
 							"    f\"jdbc:sqlserver://ws-synapse-arkon.sql.azuresynapse.net:1433;\"\n",
@@ -539,7 +568,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from pyspark.sql import DataFrame\n",
 							"\n",
@@ -554,7 +582,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"total_rows = df_parquet.count()\n",
 							"print(f\"🔢 Total de filas: {total_rows}\")"
@@ -564,7 +591,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"df_parquet.printSchema()"
 						],
@@ -573,7 +599,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from pyspark.sql.functions import col\n",
 							"\n",
@@ -591,7 +616,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							""
 						],
