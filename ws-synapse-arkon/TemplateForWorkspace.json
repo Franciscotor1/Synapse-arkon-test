@@ -427,7 +427,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "6297ac66-ee71-47ba-bd26-0605c87a78f5"
+						"spark.autotune.trackingId": "ba379314-bb3a-4366-a900-f03a7f2eaac9"
 					}
 				},
 				"metadata": {
@@ -452,23 +452,26 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"from notebookutils import mssparkutils\n",
 							"mssparkutils.credentials.help()\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 17
+						"execution_count": 1
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"from notebookutils import mssparkutils\n",
 							"\n",
@@ -484,10 +487,11 @@
 							"    raise RuntimeError(f\"❌ Error obteniendo el secreto '{secret_name}': {e}\")"
 						],
 						"outputs": [],
-						"execution_count": 18
+						"execution_count": 2
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"jdbc_url = (\n",
 							"    f\"jdbc:sqlserver://ws-synapse-arkon.sql.azuresynapse.net:1433;\"\n",
@@ -504,7 +508,7 @@
 							"print(jdbc_url)"
 						],
 						"outputs": [],
-						"execution_count": 19
+						"execution_count": 3
 					},
 					{
 						"cell_type": "code",
@@ -531,10 +535,63 @@
 							"print(f\"\\n🔢 Total de filas: {total_rows}\")"
 						],
 						"outputs": [],
-						"execution_count": 20
+						"execution_count": 4
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"from pyspark.sql import DataFrame\n",
+							"\n",
+							"# Convertir a Parquet (en memoria)\n",
+							"df_parquet = df  # El DataFrame ya está listo para usar como si fuera parquet\n",
+							"\n",
+							"# Opcional: Si quieres verificar el esquema o hacer operaciones encadenadas\n",
+							"df_parquet.cache()  # Lo mantienes en memoria si planeas reusarlo"
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"total_rows = df_parquet.count()\n",
+							"print(f\"🔢 Total de filas: {total_rows}\")"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"df_parquet.printSchema()"
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"from pyspark.sql.functions import col\n",
+							"\n",
+							"# Contar valores nulos por columna\n",
+							"null_counts = df_parquet.select(\n",
+							"    [col(c).isNull().cast(\"int\").alias(c) for c in df_parquet.columns]\n",
+							").first().asDict()\n",
+							"\n",
+							"print(\"❌ Valores nulos por columna:\")\n",
+							"for col_name, count in null_counts.items():\n",
+							"    print(f\"{col_name}: {count}\")"
+						],
+						"outputs": [],
+						"execution_count": 9
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							""
 						],
@@ -570,16 +627,12 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1b5dd7db-410e-40d0-a253-17026dc294e9"
+						"spark.autotune.trackingId": "1d57d59d-522b-4deb-a235-9d8a9e78eea0"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
-					"kernelspec": {
-						"name": "synapse_pyspark",
-						"display_name": "python"
-					},
 					"language_info": {
 						"name": "python"
 					},
@@ -590,13 +643,14 @@
 						"endpoint": "https://ws-synapse-arkon.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/arkonpool",
 						"auth": {
 							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net"
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
 						},
 						"sparkVersion": "3.4",
 						"nodeCount": 10,
 						"cores": 4,
 						"memory": 28,
-						"automaticScaleJobs": false
+						"extraHeader": null
 					},
 					"sessionKeepAliveTimeout": 15
 				},
@@ -732,7 +786,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"# Ruta en gold (directamente en la raíz)\n",
 							"gold_output_path = \"abfss://gold@blobstoragearkon.dfs.core.windows.net/gold_layer/workers_by_fullname.parquet\"\n",
@@ -762,7 +815,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"# 1. Ruta del archivo original\n",
 							"input_path = \"abfss://silver@blobstoragearkon.dfs.core.windows.net/silver_layer/workers_by_fullname.parquet\"\n",
@@ -1020,12 +1072,10 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							""
 						],
-						"outputs": [],
-						"execution_count": null
+						"outputs": []
 					}
 				]
 			},
