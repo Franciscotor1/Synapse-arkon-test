@@ -403,16 +403,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/conector_raw_parquet')]",
-			"type": "Microsoft.Synapse/workspaces/notebooks",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"metadata": {},
-				"cells": []
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/conector_to_sql_raw')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -580,12 +570,16 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1d57d59d-522b-4deb-a235-9d8a9e78eea0"
+						"spark.autotune.trackingId": "1b5dd7db-410e-40d0-a253-17026dc294e9"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
 					"language_info": {
 						"name": "python"
 					},
@@ -596,14 +590,13 @@
 						"endpoint": "https://ws-synapse-arkon.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/arkonpool",
 						"auth": {
 							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net",
-							"authHeader": null
+							"authResource": "https://dev.azuresynapse.net"
 						},
 						"sparkVersion": "3.4",
 						"nodeCount": 10,
 						"cores": 4,
 						"memory": 28,
-						"extraHeader": null
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 15
 				},
@@ -739,6 +732,7 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"# Ruta en gold (directamente en la raíz)\n",
 							"gold_output_path = \"abfss://gold@blobstoragearkon.dfs.core.windows.net/gold_layer/workers_by_fullname.parquet\"\n",
@@ -768,6 +762,7 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"# 1. Ruta del archivo original\n",
 							"input_path = \"abfss://silver@blobstoragearkon.dfs.core.windows.net/silver_layer/workers_by_fullname.parquet\"\n",
@@ -1025,22 +1020,14 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							""
 						],
-						"outputs": []
+						"outputs": [],
+						"execution_count": null
 					}
 				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/silver_layer_parquet_12655bb1-7aec-4000-b9e2-fca00cd0e59f')]",
-			"type": "Microsoft.Synapse/workspaces/notebooks",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"metadata": {},
-				"cells": []
 			},
 			"dependsOn": []
 		},
