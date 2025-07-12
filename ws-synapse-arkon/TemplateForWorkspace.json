@@ -56,7 +56,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "conetor_raw",
+								"referenceName": "conector_to_sql_raw",
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
@@ -183,7 +183,7 @@
 				"lastPublishTime": "2025-07-12T03:58:36Z"
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/notebooks/conetor_raw')]",
+				"[concat(variables('workspaceId'), '/notebooks/conector_to_sql_raw')]",
 				"[concat(variables('workspaceId'), '/bigDataPools/arkonpool')]",
 				"[concat(variables('workspaceId'), '/notebooks/silver_layer_parquet')]",
 				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_conection')]"
@@ -413,7 +413,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/conetor_raw')]",
+			"name": "[concat(parameters('workspaceName'), '/conector_to_sql_raw')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -437,7 +437,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "eeb27b74-ddf8-4fbc-b44d-c12f2201839d"
+						"spark.autotune.trackingId": "6297ac66-ee71-47ba-bd26-0605c87a78f5"
 					}
 				},
 				"metadata": {
@@ -462,15 +462,13 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from notebookutils import mssparkutils\n",
 							"mssparkutils.credentials.help()\n",
@@ -481,7 +479,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from notebookutils import mssparkutils\n",
 							"\n",
@@ -501,7 +498,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"jdbc_url = (\n",
 							"    f\"jdbc:sqlserver://ws-synapse-arkon.sql.azuresynapse.net:1433;\"\n",
@@ -549,7 +545,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							""
 						],
