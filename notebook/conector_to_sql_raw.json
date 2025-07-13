@@ -11,17 +11,17 @@
 			"type": "BigDataPoolReference"
 		},
 		"sessionProperties": {
-			"driverMemory": "56g",
-			"driverCores": 8,
-			"executorMemory": "56g",
-			"executorCores": 8,
-			"numExecutors": 2,
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 1,
 			"runAsWorkspaceSystemIdentity": false,
 			"conf": {
 				"spark.dynamicAllocation.enabled": "false",
-				"spark.dynamicAllocation.minExecutors": "2",
-				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "33d49fe3-e3ef-41f7-a041-080519abfb02"
+				"spark.dynamicAllocation.minExecutors": "1",
+				"spark.dynamicAllocation.maxExecutors": "1",
+				"spark.autotune.trackingId": "87ecc13c-cdce-4461-b7d4-50baf4edf820"
 			}
 		},
 		"metadata": {
@@ -45,8 +45,8 @@
 				},
 				"sparkVersion": "3.4",
 				"nodeCount": 10,
-				"cores": 8,
-				"memory": 56,
+				"cores": 4,
+				"memory": 28,
 				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
@@ -59,7 +59,25 @@
 					"mssparkutils.credentials.help()\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from notebookutils import mssparkutils\n",
+					"\n",
+					"# Nombre del Azure Key Vault y del secreto\n",
+					"akv_name = \"synapse-arkonkey\"\n",
+					"secret_name = \"synapse-arkonpassdb\"\n",
+					"\n",
+					"# Obtener la contraseña desde Azure Key Vault\n",
+					"try:\n",
+					"    db_password = mssparkutils.credentials.getSecret(akv_name, secret_name)\n",
+					"    print(\"✅ Contraseña obtenida desde Azure Key Vault\")\n",
+					"except Exception as e:\n",
+					"    raise RuntimeError(f\"❌ Error obteniendo el secreto '{secret_name}': {e}\")"
+				],
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -78,7 +96,7 @@
 					"print(\"🔗 Cadena de conexión lista:\")\n",
 					"print(jdbc_url)"
 				],
-				"execution_count": null
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -104,7 +122,7 @@
 					"total_rows = df.count()\n",
 					"print(f\"\\n🔢 Total de filas: {total_rows}\")"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -117,7 +135,7 @@
 					"# Opcional: Si quieres verificar el esquema o hacer operaciones encadenadas\n",
 					"df_parquet.cache()  # Lo mantienes en memoria si planeas reusarlo"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -125,14 +143,14 @@
 					"total_rows = df_parquet.count()\n",
 					"print(f\"🔢 Total de filas: {total_rows}\")"
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"df_parquet.printSchema()"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -148,7 +166,7 @@
 					"for col_name, count in null_counts.items():\n",
 					"    print(f\"{col_name}: {count}\")"
 				],
-				"execution_count": null
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
