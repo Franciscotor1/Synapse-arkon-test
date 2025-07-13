@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8715fd4e-fc75-4d18-9150-375db83095ae"
+				"spark.autotune.trackingId": "9f8aa875-de5a-4801-8574-b80850b2d34a"
 			}
 		},
 		"metadata": {
@@ -59,25 +59,7 @@
 					"mssparkutils.credentials.help()\n",
 					""
 				],
-				"execution_count": 1
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"from notebookutils import mssparkutils\n",
-					"\n",
-					"# Nombre del Azure Key Vault y del secreto\n",
-					"akv_name = \"synapse-arkonkey\"\n",
-					"secret_name = \"synapse-arkonpassdb\"\n",
-					"\n",
-					"# Obtener la contraseña desde Azure Key Vault\n",
-					"try:\n",
-					"    db_password = mssparkutils.credentials.getSecret(akv_name, secret_name)\n",
-					"    print(\"✅ Contraseña obtenida desde Azure Key Vault\")\n",
-					"except Exception as e:\n",
-					"    raise RuntimeError(f\"❌ Error obteniendo el secreto '{secret_name}': {e}\")"
-				],
-				"execution_count": 2
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -96,7 +78,7 @@
 					"print(\"🔗 Cadena de conexión lista:\")\n",
 					"print(jdbc_url)"
 				],
-				"execution_count": 3
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -122,7 +104,7 @@
 					"total_rows = df.count()\n",
 					"print(f\"\\n🔢 Total de filas: {total_rows}\")"
 				],
-				"execution_count": 4
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -135,7 +117,7 @@
 					"# Opcional: Si quieres verificar el esquema o hacer operaciones encadenadas\n",
 					"df_parquet.cache()  # Lo mantienes en memoria si planeas reusarlo"
 				],
-				"execution_count": 6
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -143,14 +125,14 @@
 					"total_rows = df_parquet.count()\n",
 					"print(f\"🔢 Total de filas: {total_rows}\")"
 				],
-				"execution_count": 7
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"df_parquet.printSchema()"
 				],
-				"execution_count": 8
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -166,7 +148,7 @@
 					"for col_name, count in null_counts.items():\n",
 					"    print(f\"{col_name}: {count}\")"
 				],
-				"execution_count": 9
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
