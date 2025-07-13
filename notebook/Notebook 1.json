@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "7443afa0-f124-42f5-a5d4-105a903a5da8"
+				"spark.autotune.trackingId": "73e70cbf-3525-47a6-9e3e-8566d4db80d4"
 			}
 		},
 		"metadata": {
@@ -50,29 +50,53 @@
 		"cells": [
 			{
 				"cell_type": "code",
+				"source": [
+					"from notebookutils import mssparkutils\n",
+					"\n",
+					"# Datos del Key Vault\n",
+					"akv_name = \"synapse-arkonkey\"  # Nombre del Key Vault (sin .vault.azure.net)\n",
+					"secret_key = \"synapse-arkonpassdb\"  # Nombre del secreto\n",
+					"linked_service_name = \"AzureKeyVault1\"  # Nombre del Linked Service\n",
+					"\n",
+					"# Obtener el secreto usando el Linked Service\n",
+					"try:\n",
+					"    db_password = mssparkutils.credentials.getSecret(akv_name, secret_key, linked_service_name)\n",
+					"    print(\"✅ Contraseña obtenida:\", db_password[:5] + \"*****\")\n",
+					"except Exception as e:\n",
+					"    raise RuntimeError(f\"❌ Error obteniendo el secreto '{secret_key}': {e}\")"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
 				"metadata": {
 					"collapsed": false
 				},
 				"source": [
-					"# Definir las credenciales de conexión (asegúrate de no poner la contraseña directamente en el código)\n",
-					"jdbc_url = \"jdbc:sqlserver://ws-synapse-arkon.sql.azuresynapse.net:1433;database=sql_relational_dwh\"\n",
-					"properties = {\n",
-					"    \"user\": \"franadmin01@ws-synapse-arkon\",\n",
-					"    \"password\": \"Sql.01pacox\",  # No subas la contraseña a GitHub!\n",
-					"    \"driver\": \"com.microsoft.sqlserver.jdbc.SQLServerDriver\"\n",
-					"}\n",
+					"jdbc_url = (\n",
+					"    f\"jdbc:sqlserver://ws-synapse-arkon.sql.azuresynapse.net:1433;\"\n",
+					"    f\"databaseName=sql_relational_dwh;\"\n",
+					"    f\"user=franadmin01@ws-synapse-arkon;\"\n",
+					"    f\"password={db_password};\"\n",
+					"    f\"encrypt=true;\"\n",
+					"    f\"trustServerCertificate=false;\"\n",
+					"    f\"hostNameInCertificate=*.sql.azuresynapse.net;\"\n",
+					"    f\"loginTimeout=30;\"\n",
+					")\n",
 					"\n",
-					"# Tabla que deseas leer\n",
-					"table_name = \"dbo.sql_workers_raw\"\n",
+					"print(\"🔗 Cadena de conexión lista\")\n",
 					"\n",
-					"# Lee la tabla desde la base de datos usando JDBC\n",
-					"df = spark.read.jdbc(url=jdbc_url, table=table_name, properties=properties)\n",
+					"# Leer tabla desde SQL Pool\n",
+					"df = spark.read \\\n",
+					"    .format(\"jdbc\") \\\n",
+					"    .option(\"url\", jdbc_url) \\\n",
+					"    .option(\"dbtable\", \"dbo.sql_workers_raw\") \\\n",
+					"    .option(\"driver\", \"com.microsoft.sqlserver.jdbc.SQLServerDriver\") \\\n",
+					"    .load()\n",
 					"\n",
-					"# Mostrar las primeras filas con display\n",
-					"display(df)\n",
-					""
+					"display(df.limit(20))"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
