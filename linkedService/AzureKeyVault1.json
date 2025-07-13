@@ -1,0 +1,10 @@
+{
+	"name": "AzureKeyVault1",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://synapse-arkonkey.vault.azure.net/secrets/synapse-arkonpassdb/82e8a0c1d6b54953999416d9486ff7aa"
+		}
+	}
+}
