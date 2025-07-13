@@ -453,17 +453,17 @@
 					"type": "BigDataPoolReference"
 				},
 				"sessionProperties": {
-					"driverMemory": "56g",
-					"driverCores": 8,
-					"executorMemory": "56g",
-					"executorCores": 8,
-					"numExecutors": 2,
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 1,
 					"runAsWorkspaceSystemIdentity": false,
 					"conf": {
 						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "2",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "7eb05b14-c873-46d6-a47b-cd019e87a76e"
+						"spark.dynamicAllocation.minExecutors": "1",
+						"spark.dynamicAllocation.maxExecutors": "1",
+						"spark.autotune.trackingId": "a10a04e0-8b4f-4c13-9f40-131545f0a1b4"
 					}
 				},
 				"metadata": {
@@ -487,8 +487,8 @@
 						},
 						"sparkVersion": "3.4",
 						"nodeCount": 10,
-						"cores": 8,
-						"memory": 56,
+						"cores": 4,
+						"memory": 28,
 						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
@@ -503,7 +503,27 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"from notebookutils import mssparkutils\n",
+							"\n",
+							"# Nombre del Azure Key Vault y del secreto\n",
+							"akv_name = \"synapse-arkonkey\"\n",
+							"secret_name = \"synapse-arkonpassdb\"\n",
+							"\n",
+							"# Obtener la contraseña desde Azure Key Vault\n",
+							"try:\n",
+							"    db_password = mssparkutils.credentials.getSecret(akv_name, secret_name)\n",
+							"    print(\"✅ Contraseña obtenida desde Azure Key Vault\")\n",
+							"except Exception as e:\n",
+							"    raise RuntimeError(f\"❌ Error obteniendo el secreto '{secret_name}': {e}\")"
+						],
+						"outputs": [],
+						"execution_count": 4
 					},
 					{
 						"cell_type": "code",
@@ -524,7 +544,7 @@
 							"print(jdbc_url)"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 5
 					},
 					{
 						"cell_type": "code",
@@ -551,7 +571,7 @@
 							"print(f\"\\n🔢 Total de filas: {total_rows}\")"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 6
 					},
 					{
 						"cell_type": "code",
@@ -566,7 +586,7 @@
 							"df_parquet.cache()  # Lo mantienes en memoria si planeas reusarlo"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 7
 					},
 					{
 						"cell_type": "code",
@@ -576,7 +596,7 @@
 							"print(f\"🔢 Total de filas: {total_rows}\")"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 8
 					},
 					{
 						"cell_type": "code",
@@ -585,7 +605,7 @@
 							"df_parquet.printSchema()"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 9
 					},
 					{
 						"cell_type": "code",
@@ -603,7 +623,7 @@
 							"    print(f\"{col_name}: {count}\")"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 10
 					},
 					{
 						"cell_type": "code",
@@ -637,18 +657,22 @@
 					"driverCores": 4,
 					"executorMemory": "28g",
 					"executorCores": 4,
-					"numExecutors": 2,
+					"numExecutors": 1,
 					"runAsWorkspaceSystemIdentity": false,
 					"conf": {
 						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "2",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1d57d59d-522b-4deb-a235-9d8a9e78eea0"
+						"spark.dynamicAllocation.minExecutors": "1",
+						"spark.dynamicAllocation.maxExecutors": "1",
+						"spark.autotune.trackingId": "9e81b19d-ee80-4f5d-bc2c-67a89b552a50"
 					}
 				},
 				"metadata": {
 					"saveOutput": true,
 					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
 					"language_info": {
 						"name": "python"
 					},
@@ -659,14 +683,12 @@
 						"endpoint": "https://ws-synapse-arkon.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/arkonpool",
 						"auth": {
 							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net",
-							"authHeader": null
+							"authResource": "https://dev.azuresynapse.net"
 						},
 						"sparkVersion": "3.4",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28,
-						"extraHeader": null
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 15
 				},
@@ -1091,7 +1113,8 @@
 						"source": [
 							""
 						],
-						"outputs": []
+						"outputs": [],
+						"execution_count": null
 					}
 				]
 			},
@@ -1112,7 +1135,7 @@
 					"minNodeCount": 3
 				},
 				"nodeCount": 10,
-				"nodeSize": "Medium",
+				"nodeSize": "Small",
 				"nodeSizeFamily": "MemoryOptimized",
 				"sparkVersion": "3.4",
 				"isComputeIsolationEnabled": false,
