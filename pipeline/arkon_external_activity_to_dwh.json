@@ -7,7 +7,7 @@
 				"type": "SynapseNotebook",
 				"dependsOn": [
 					{
-						"activity": "testsecret",
+						"activity": "Extraction from SQL Database",
 						"dependencyConditions": [
 							"Skipped"
 						]
@@ -45,7 +45,8 @@
 				}
 			},
 			{
-				"name": "Copy into - bronce to SQL database",
+				"name": "Copy into - bronze to SQL Database",
+				"description": "En esta face del ETL hemos creado antes una actividad: \"Copy Into\" la cual automatiza la copia del csv raw dentro del Blob Storage, pasandolo a nuestra Base de datos relacional (Dedicated SQL Pool) que también funciona como Datawarehouse\n\nCopy into, tiene una modalidad automática para hacer esa copia, además de una forma manual. En este Script lo utilizamos como un simple Query para validar, ya que el proceso lo hicimos automático anteriormente en los contenedores Linkeados del storage, y sólo validamos que la tabla pueda consultar desde la Base de datos  Relacional creada con los datos integrados (T-SQL)",
 				"type": "Script",
 				"dependsOn": [],
 				"policy": {
@@ -137,11 +138,11 @@
 				}
 			},
 			{
-				"name": "testsecret",
+				"name": "Extraction from SQL Database",
 				"type": "SynapseNotebook",
 				"dependsOn": [
 					{
-						"activity": "Copy into - bronce to SQL database",
+						"activity": "Copy into - bronze to SQL Database",
 						"dependencyConditions": [
 							"Succeeded"
 						]
