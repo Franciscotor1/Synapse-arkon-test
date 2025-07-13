@@ -8,6 +8,9 @@
 		"ws-synapse-arkon-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:ws-synapse-arkon.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
+		"AzureKeyVault1_properties_typeProperties_baseUrl": {
+			"value": "https://synapse-arkonkey.vault.azure.net/secrets/synapse-arkonpassdb/82e8a0c1d6b54953999416d9486ff7aa"
+		},
 		"ls_synapse_conection_properties_typeProperties_server": {
 			"value": "ws-synapse-arkon.sql.azuresynapse.net"
 		},
