@@ -1,0 +1,86 @@
+{
+	"name": "Notebook 1",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "arkonpool",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "3ac9f933-6968-4a05-9606-e21ddda41cc3"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/242239df-ca9e-439a-b560-2b82454d87ff/resourceGroups/arkon-gr/providers/Microsoft.Synapse/workspaces/ws-synapse-arkon/bigDataPools/arkonpool",
+				"name": "arkonpool",
+				"type": "Spark",
+				"endpoint": "https://ws-synapse-arkon.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/arkonpool",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"# Definir las credenciales de conexión (asegúrate de no poner la contraseña directamente en el código)\n",
+					"jdbc_url = \"jdbc:sqlserver://ws-synapse-arkon.sql.azuresynapse.net:1433;database=sql_relational_dwh\"\n",
+					"properties = {\n",
+					"    \"user\": \"franadmin01@ws-synapse-arkon\",\n",
+					"    \"password\": \"Sql.01pacox\",  # No subas la contraseña a GitHub!\n",
+					"    \"driver\": \"com.microsoft.sqlserver.jdbc.SQLServerDriver\"\n",
+					"}\n",
+					"\n",
+					"# Tabla que deseas leer\n",
+					"table_name = \"dbo.sql_workers_raw\"\n",
+					"\n",
+					"# Lee la tabla desde la base de datos usando JDBC\n",
+					"df = spark.read.jdbc(url=jdbc_url, table=table_name, properties=properties)\n",
+					"\n",
+					"# Mostrar las primeras filas con display\n",
+					"display(df)\n",
+					""
+				],
+				"execution_count": 17
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
