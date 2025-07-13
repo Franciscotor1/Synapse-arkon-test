@@ -38,7 +38,10 @@
 						"spark.dynamicAllocation.maxExecutors": null
 					},
 					"driverSize": "Small",
-					"numExecutors": null
+					"numExecutors": null,
+					"authentication": {
+						"type": "MSI"
+					}
 				}
 			},
 			{
