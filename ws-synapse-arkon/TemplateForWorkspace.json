@@ -231,58 +231,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/testconected')]",
-			"type": "Microsoft.Synapse/workspaces/pipelines",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"activities": [
-					{
-						"name": "testsecret",
-						"type": "SynapseNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebook": {
-								"referenceName": "raw_conector_to_sql",
-								"type": "NotebookReference"
-							},
-							"snapshot": true,
-							"sparkPool": {
-								"referenceName": "arkonpool",
-								"type": "BigDataPoolReference"
-							},
-							"executorSize": "Small",
-							"conf": {
-								"spark.dynamicAllocation.enabled": null,
-								"spark.dynamicAllocation.minExecutors": null,
-								"spark.dynamicAllocation.maxExecutors": null
-							},
-							"driverSize": "Small",
-							"numExecutors": null,
-							"authentication": {
-								"type": "MSI"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/notebooks/raw_conector_to_sql')]",
-				"[concat(variables('workspaceId'), '/bigDataPools/arkonpool')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/AzureSynapseAnalyticsTable1')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -409,6 +357,46 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/DDL_By_fullname')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE EXTERNAL TABLE [dbo].[workers_by_fullname]\n( \n\t[full_name] [varchar](255)  NULL,\n\t[company_name] [varchar](255)  NULL,\n\t[address] [varchar](255)  NULL,\n\t[city] [varchar](100)  NULL,\n\t[county] [varchar](100)  NULL,\n\t[state] [char](2)  NULL,\n\t[zip] [int]  NULL,\n\t[phone1] [varchar](20)  NULL,\n\t[phone2] [varchar](20)  NULL,\n\t[email] [varchar](255)  NULL,\n\t[web] [varchar](255)  NULL\n)\nWITH (DATA_SOURCE = [blob_storage], LOCATION = N'silver_layer/workers_by_fullname.parquet', FILE_FORMAT = [ParquetFormat], REJECT_TYPE = VALUE, REJECT_VALUE = 0 )\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "sql_relational_dwh",
+						"poolName": "sql_relational_dwh"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE EXTERNAL TABLE [dbo].[workers_by_fullname]\n( \n\t[full_name] [varchar](255)  NULL,\n\t[company_name] [varchar](255)  NULL,\n\t[address] [varchar](255)  NULL,\n\t[city] [varchar](100)  NULL,\n\t[county] [varchar](100)  NULL,\n\t[state] [char](2)  NULL,\n\t[zip] [int]  NULL,\n\t[phone1] [varchar](20)  NULL,\n\t[phone2] [varchar](20)  NULL,\n\t[email] [varchar](255)  NULL,\n\t[web] [varchar](255)  NULL\n)\nWITH (DATA_SOURCE = [blob_storage], LOCATION = N'silver_layer/workers_by_fullname.parquet', FILE_FORMAT = [ParquetFormat], REJECT_TYPE = VALUE, REJECT_VALUE = 0 )\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "sql_relational_dwh",
+						"poolName": "sql_relational_dwh"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/bigcities_sql_dwh_gold')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -434,7 +422,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "SELECT TOP 100 * FROM dbo.sql_byfullname_dwh_gold\nGo",
+					"query": "SELECT TOP 100 * FROM dbo.sql_byfullname_dwh_gold\nGo\n\n\n",
 					"metadata": {
 						"language": "sql"
 					},
