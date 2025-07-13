@@ -453,17 +453,17 @@
 					"type": "BigDataPoolReference"
 				},
 				"sessionProperties": {
-					"driverMemory": "28g",
-					"driverCores": 4,
-					"executorMemory": "28g",
-					"executorCores": 4,
+					"driverMemory": "56g",
+					"driverCores": 8,
+					"executorMemory": "56g",
+					"executorCores": 8,
 					"numExecutors": 2,
 					"runAsWorkspaceSystemIdentity": false,
 					"conf": {
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "d54e0c6b-7b47-4299-9d87-97619044dcb7"
+						"spark.autotune.trackingId": "7eb05b14-c873-46d6-a47b-cd019e87a76e"
 					}
 				},
 				"metadata": {
@@ -487,8 +487,8 @@
 						},
 						"sparkVersion": "3.4",
 						"nodeCount": 10,
-						"cores": 4,
-						"memory": 28,
+						"cores": 8,
+						"memory": 56,
 						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
@@ -1112,7 +1112,7 @@
 					"minNodeCount": 3
 				},
 				"nodeCount": 10,
-				"nodeSize": "Small",
+				"nodeSize": "Medium",
 				"nodeSizeFamily": "MemoryOptimized",
 				"sparkVersion": "3.4",
 				"isComputeIsolationEnabled": false,
