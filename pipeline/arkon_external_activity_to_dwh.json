@@ -7,9 +7,9 @@
 				"type": "SynapseNotebook",
 				"dependsOn": [
 					{
-						"activity": "raw",
+						"activity": "testsecret",
 						"dependencyConditions": [
-							"Succeeded"
+							"Skipped"
 						]
 					}
 				],
@@ -137,7 +137,7 @@
 				}
 			},
 			{
-				"name": "raw",
+				"name": "testsecret",
 				"type": "SynapseNotebook",
 				"dependsOn": [
 					{
@@ -157,7 +157,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "Notebook 1",
+						"referenceName": "raw_conector_to_sql",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
@@ -166,7 +166,13 @@
 						"type": "BigDataPoolReference"
 					},
 					"executorSize": "Small",
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
 					"driverSize": "Small",
+					"numExecutors": null,
 					"authentication": {
 						"type": "MSI"
 					}

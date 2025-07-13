@@ -1,6 +1,9 @@
 {
-	"name": "Notebook 1",
+	"name": "raw_conector_to_sql",
 	"properties": {
+		"folder": {
+			"name": "Raw_scripts"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "73e70cbf-3525-47a6-9e3e-8566d4db80d4"
+				"spark.autotune.trackingId": "57317612-e41b-426e-b5d6-7c50565dfc9c"
 			}
 		},
 		"metadata": {
