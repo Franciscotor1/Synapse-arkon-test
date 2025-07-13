@@ -2,7 +2,7 @@
 	"name": "byfullname_sql_dwh_gold",
 	"properties": {
 		"content": {
-			"query": "SELECT TOP 100 * FROM dbo.sql_byfullname_dwh_gold\nGo",
+			"query": "SELECT TOP 100 * FROM dbo.sql_byfullname_dwh_gold\nGo\n\n\n",
 			"metadata": {
 				"language": "sql"
 			},
