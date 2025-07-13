@@ -1,0 +1,10 @@
+{
+	"name": "Keyforpipelines",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://Synapse-arkonkey.vault.azure.net/"
+		}
+	}
+}
