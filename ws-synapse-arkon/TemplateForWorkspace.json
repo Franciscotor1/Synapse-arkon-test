@@ -44,9 +44,9 @@
 						"type": "SynapseNotebook",
 						"dependsOn": [
 							{
-								"activity": "raw",
+								"activity": "testsecret",
 								"dependencyConditions": [
-									"Succeeded"
+									"Skipped"
 								]
 							}
 						],
@@ -174,7 +174,7 @@
 						}
 					},
 					{
-						"name": "raw",
+						"name": "testsecret",
 						"type": "SynapseNotebook",
 						"dependsOn": [
 							{
@@ -194,7 +194,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "Notebook 1",
+								"referenceName": "raw_conector_to_sql",
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
@@ -226,7 +226,7 @@
 				"[concat(variables('workspaceId'), '/notebooks/silver_layer_parquet')]",
 				"[concat(variables('workspaceId'), '/bigDataPools/arkonpool')]",
 				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_conection')]",
-				"[concat(variables('workspaceId'), '/notebooks/Notebook 1')]"
+				"[concat(variables('workspaceId'), '/notebooks/raw_conector_to_sql')]"
 			]
 		},
 		{
@@ -249,7 +249,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "conector_to_sql_raw",
+								"referenceName": "raw_conector_to_sql",
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
@@ -277,7 +277,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/notebooks/conector_to_sql_raw')]",
+				"[concat(variables('workspaceId'), '/notebooks/raw_conector_to_sql')]",
 				"[concat(variables('workspaceId'), '/bigDataPools/arkonpool')]"
 			]
 		},
@@ -508,185 +508,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Notebook 1')]",
-			"type": "Microsoft.Synapse/workspaces/notebooks",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"nbformat": 4,
-				"nbformat_minor": 2,
-				"bigDataPool": {
-					"referenceName": "arkonpool",
-					"type": "BigDataPoolReference"
-				},
-				"sessionProperties": {
-					"driverMemory": "28g",
-					"driverCores": 4,
-					"executorMemory": "28g",
-					"executorCores": 4,
-					"numExecutors": 1,
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "1",
-						"spark.dynamicAllocation.maxExecutors": "1",
-						"spark.autotune.trackingId": "812b64de-5308-4494-89df-2381547c4eaa"
-					}
-				},
-				"metadata": {
-					"saveOutput": true,
-					"enableDebugMode": false,
-					"kernelspec": {
-						"name": "synapse_pyspark",
-						"display_name": "Synapse PySpark"
-					},
-					"language_info": {
-						"name": "python"
-					},
-					"a365ComputeOptions": {
-						"id": "/subscriptions/242239df-ca9e-439a-b560-2b82454d87ff/resourceGroups/arkon-gr/providers/Microsoft.Synapse/workspaces/ws-synapse-arkon/bigDataPools/arkonpool",
-						"name": "arkonpool",
-						"type": "Spark",
-						"endpoint": "https://ws-synapse-arkon.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/arkonpool",
-						"auth": {
-							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net"
-						},
-						"sparkVersion": "3.4",
-						"nodeCount": 10,
-						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
-					},
-					"sessionKeepAliveTimeout": 30
-				},
-				"cells": [
-					{
-						"cell_type": "code",
-						"metadata": {},
-						"source": [
-							"from notebookutils import mssparkutils\n",
-							"\n",
-							"# Datos del Key Vault\n",
-							"akv_name = \"synapse-arkonkey\"  # Nombre del Key Vault (sin .vault.azure.net)\n",
-							"secret_key = \"synapse-arkonpassdb\"  # Nombre del secreto\n",
-							"linked_service_name = \"AzureKeyVault1\"  # Nombre del Linked Service\n",
-							"\n",
-							"# Obtener el secreto usando el Linked Service\n",
-							"try:\n",
-							"    db_password = mssparkutils.credentials.getSecret(akv_name, secret_key, linked_service_name)\n",
-							"    print(\"✅ Contraseña obtenida:\", db_password[:5] + \"*****\")\n",
-							"except Exception as e:\n",
-							"    raise RuntimeError(f\"❌ Error obteniendo el secreto '{secret_key}': {e}\")"
-						],
-						"outputs": [],
-						"execution_count": 3
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"collapsed": false
-						},
-						"source": [
-							"jdbc_url = (\n",
-							"    f\"jdbc:sqlserver://ws-synapse-arkon.sql.azuresynapse.net:1433;\"\n",
-							"    f\"databaseName=sql_relational_dwh;\"\n",
-							"    f\"user=franadmin01@ws-synapse-arkon;\"\n",
-							"    f\"password={db_password};\"\n",
-							"    f\"encrypt=true;\"\n",
-							"    f\"trustServerCertificate=false;\"\n",
-							"    f\"hostNameInCertificate=*.sql.azuresynapse.net;\"\n",
-							"    f\"loginTimeout=30;\"\n",
-							")\n",
-							"\n",
-							"print(\"🔗 Cadena de conexión lista\")\n",
-							"\n",
-							"# Leer tabla desde SQL Pool\n",
-							"df = spark.read \\\n",
-							"    .format(\"jdbc\") \\\n",
-							"    .option(\"url\", jdbc_url) \\\n",
-							"    .option(\"dbtable\", \"dbo.sql_workers_raw\") \\\n",
-							"    .option(\"driver\", \"com.microsoft.sqlserver.jdbc.SQLServerDriver\") \\\n",
-							"    .load()\n",
-							"\n",
-							"display(df.limit(20))"
-						],
-						"outputs": [],
-						"execution_count": 4
-					},
-					{
-						"cell_type": "code",
-						"metadata": {},
-						"source": [
-							""
-						],
-						"outputs": [],
-						"execution_count": null
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/Notebook 2')]",
-			"type": "Microsoft.Synapse/workspaces/notebooks",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"nbformat": 4,
-				"nbformat_minor": 2,
-				"sessionProperties": {
-					"driverMemory": "28g",
-					"driverCores": 4,
-					"executorMemory": "28g",
-					"executorCores": 4,
-					"numExecutors": 2,
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "2",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "9e71bf59-6ef2-41c8-ab8d-ddf589e43415"
-					}
-				},
-				"metadata": {
-					"saveOutput": true,
-					"enableDebugMode": false,
-					"kernelspec": {
-						"name": "synapse_pyspark",
-						"display_name": "python"
-					},
-					"language_info": {
-						"name": "python"
-					},
-					"sessionKeepAliveTimeout": 30
-				},
-				"cells": [
-					{
-						"cell_type": "code",
-						"source": [
-							"# Definir las credenciales de conexión (asegúrate de no poner la contraseña directamente en el código)\n",
-							"jdbc_url = \"jdbc:sqlserver://ws-synapse-arkon.sql.azuresynapse.net:1433;database=sql_relational_dwh\"\n",
-							"properties = {\n",
-							"    \"user\": \"franadmin01@ws-synapse-arkon\",\n",
-							"    \"password\": \"Sql.01pacox\",  # No subas la contraseña a GitHub!\n",
-							"    \"driver\": \"com.microsoft.sqlserver.jdbc.SQLServerDriver\"\n",
-							"}\n",
-							"\n",
-							"# Tabla que deseas leer\n",
-							"table_name = \"dbo.sql_workers_raw\"\n",
-							"\n",
-							"# Lee la tabla desde la base de datos usando JDBC\n",
-							"df = spark.read.jdbc(url=jdbc_url, table=table_name, properties=properties)\n",
-							"\n",
-							"# Mostrar las primeras filas con display\n",
-							"display(df)\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": null
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/conector_to_sql_raw')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -864,6 +685,124 @@
 						],
 						"outputs": [],
 						"execution_count": 10
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/raw_conector_to_sql')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Raw_scripts"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "arkonpool",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 1,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "1",
+						"spark.dynamicAllocation.maxExecutors": "1",
+						"spark.autotune.trackingId": "57317612-e41b-426e-b5d6-7c50565dfc9c"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/242239df-ca9e-439a-b560-2b82454d87ff/resourceGroups/arkon-gr/providers/Microsoft.Synapse/workspaces/ws-synapse-arkon/bigDataPools/arkonpool",
+						"name": "arkonpool",
+						"type": "Spark",
+						"endpoint": "https://ws-synapse-arkon.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/arkonpool",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from notebookutils import mssparkutils\n",
+							"\n",
+							"# Datos del Key Vault\n",
+							"akv_name = \"synapse-arkonkey\"  # Nombre del Key Vault (sin .vault.azure.net)\n",
+							"secret_key = \"synapse-arkonpassdb\"  # Nombre del secreto\n",
+							"linked_service_name = \"AzureKeyVault1\"  # Nombre del Linked Service\n",
+							"\n",
+							"# Obtener el secreto usando el Linked Service\n",
+							"try:\n",
+							"    db_password = mssparkutils.credentials.getSecret(akv_name, secret_key, linked_service_name)\n",
+							"    print(\"✅ Contraseña obtenida:\", db_password[:5] + \"*****\")\n",
+							"except Exception as e:\n",
+							"    raise RuntimeError(f\"❌ Error obteniendo el secreto '{secret_key}': {e}\")"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"collapsed": false
+						},
+						"source": [
+							"jdbc_url = (\n",
+							"    f\"jdbc:sqlserver://ws-synapse-arkon.sql.azuresynapse.net:1433;\"\n",
+							"    f\"databaseName=sql_relational_dwh;\"\n",
+							"    f\"user=franadmin01@ws-synapse-arkon;\"\n",
+							"    f\"password={db_password};\"\n",
+							"    f\"encrypt=true;\"\n",
+							"    f\"trustServerCertificate=false;\"\n",
+							"    f\"hostNameInCertificate=*.sql.azuresynapse.net;\"\n",
+							"    f\"loginTimeout=30;\"\n",
+							")\n",
+							"\n",
+							"print(\"🔗 Cadena de conexión lista\")\n",
+							"\n",
+							"# Leer tabla desde SQL Pool\n",
+							"df = spark.read \\\n",
+							"    .format(\"jdbc\") \\\n",
+							"    .option(\"url\", jdbc_url) \\\n",
+							"    .option(\"dbtable\", \"dbo.sql_workers_raw\") \\\n",
+							"    .option(\"driver\", \"com.microsoft.sqlserver.jdbc.SQLServerDriver\") \\\n",
+							"    .load()\n",
+							"\n",
+							"display(df.limit(20))"
+						],
+						"outputs": [],
+						"execution_count": 4
 					},
 					{
 						"cell_type": "code",
