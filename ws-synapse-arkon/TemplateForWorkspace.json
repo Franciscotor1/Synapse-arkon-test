@@ -463,7 +463,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "8715fd4e-fc75-4d18-9150-375db83095ae"
+						"spark.autotune.trackingId": "d54e0c6b-7b47-4299-9d87-97619044dcb7"
 					}
 				},
 				"metadata": {
@@ -488,42 +488,26 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"from notebookutils import mssparkutils\n",
 							"mssparkutils.credentials.help()\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 1
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
-						"source": [
-							"from notebookutils import mssparkutils\n",
-							"\n",
-							"# Nombre del Azure Key Vault y del secreto\n",
-							"akv_name = \"synapse-arkonkey\"\n",
-							"secret_name = \"synapse-arkonpassdb\"\n",
-							"\n",
-							"# Obtener la contraseña desde Azure Key Vault\n",
-							"try:\n",
-							"    db_password = mssparkutils.credentials.getSecret(akv_name, secret_name)\n",
-							"    print(\"✅ Contraseña obtenida desde Azure Key Vault\")\n",
-							"except Exception as e:\n",
-							"    raise RuntimeError(f\"❌ Error obteniendo el secreto '{secret_name}': {e}\")"
-						],
-						"outputs": [],
-						"execution_count": 2
-					},
-					{
-						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"jdbc_url = (\n",
 							"    f\"jdbc:sqlserver://ws-synapse-arkon.sql.azuresynapse.net:1433;\"\n",
@@ -540,7 +524,7 @@
 							"print(jdbc_url)"
 						],
 						"outputs": [],
-						"execution_count": 3
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -567,10 +551,11 @@
 							"print(f\"\\n🔢 Total de filas: {total_rows}\")"
 						],
 						"outputs": [],
-						"execution_count": 4
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"from pyspark.sql import DataFrame\n",
 							"\n",
@@ -581,27 +566,30 @@
 							"df_parquet.cache()  # Lo mantienes en memoria si planeas reusarlo"
 						],
 						"outputs": [],
-						"execution_count": 6
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"total_rows = df_parquet.count()\n",
 							"print(f\"🔢 Total de filas: {total_rows}\")"
 						],
 						"outputs": [],
-						"execution_count": 7
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"df_parquet.printSchema()"
 						],
 						"outputs": [],
-						"execution_count": 8
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"from pyspark.sql.functions import col\n",
 							"\n",
@@ -615,10 +603,11 @@
 							"    print(f\"{col_name}: {count}\")"
 						],
 						"outputs": [],
-						"execution_count": 9
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							""
 						],
