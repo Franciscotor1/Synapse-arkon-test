@@ -46,7 +46,7 @@
 							{
 								"activity": "Extraction from SQL Database",
 								"dependencyConditions": [
-									"Skipped"
+									"Succeeded"
 								]
 							}
 						],
