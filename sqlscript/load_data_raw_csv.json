@@ -2,7 +2,7 @@
 	"name": "load_data_raw_csv",
 	"properties": {
 		"content": {
-			"query": "SELECT TOP 100 * FROM dbo.sql_workers_raw\nGo\n\nSELECT COUNT(*) AS total_filas FROM dbo.sql_workers_raw;\nGO\n\nSELECT \n    SUM(CASE WHEN first_name IS NULL OR first_name = '' THEN 1 ELSE 0 END) AS nulos_nombre,\n    SUM(CASE WHEN email IS NULL OR email = '' THEN 1 ELSE 0 END) AS nulos_email,\n    SUM(CASE WHEN phone1 IS NULL OR phone1 = '' THEN 1 ELSE 0 END) AS nulos_telefono\nFROM dbo.sql_workers_raw;\nGO",
+			"query": "SELECT TOP 100 * FROM dbo.sql_workers_raw\nGo\n\nSELECT COUNT(*) AS total_filas FROM dbo.sql_workers_raw;\nGO\n\n",
 			"metadata": {
 				"language": "sql"
 			},
