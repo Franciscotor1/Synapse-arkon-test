@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "51a68452-6f6f-4c9d-b100-fee61646cce1"
+				"spark.autotune.trackingId": "4bf048d0-7574-4497-8db1-446dec818e17"
 			}
 		},
 		"metadata": {
@@ -123,50 +123,6 @@
 					"print(f\"\\n🔢 Total de filas: {total_rows}\")"
 				],
 				"execution_count": 6
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"from pyspark.sql import DataFrame\n",
-					"\n",
-					"# Convertir a Parquet (en memoria)\n",
-					"df_parquet = df  # El DataFrame ya está listo para usar como si fuera parquet\n",
-					"\n",
-					"# Opcional: Si quieres verificar el esquema o hacer operaciones encadenadas\n",
-					"df_parquet.cache()  # Lo mantienes en memoria si planeas reusarlo"
-				],
-				"execution_count": 7
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"total_rows = df_parquet.count()\n",
-					"print(f\"🔢 Total de filas: {total_rows}\")"
-				],
-				"execution_count": 8
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"df_parquet.printSchema()"
-				],
-				"execution_count": 9
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"from pyspark.sql.functions import col\n",
-					"\n",
-					"# Contar valores nulos por columna\n",
-					"null_counts = df_parquet.select(\n",
-					"    [col(c).isNull().cast(\"int\").alias(c) for c in df_parquet.columns]\n",
-					").first().asDict()\n",
-					"\n",
-					"print(\"❌ Valores nulos por columna:\")\n",
-					"for col_name, count in null_counts.items():\n",
-					"    print(f\"{col_name}: {count}\")"
-				],
-				"execution_count": 10
 			},
 			{
 				"cell_type": "code",

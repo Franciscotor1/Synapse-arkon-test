@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "db996a9b-c58b-43b0-8ded-054a85aa00d6"
+				"spark.autotune.trackingId": "16916e04-921d-4612-9577-c9c38cf46ce4"
 			}
 		},
 		"metadata": {
@@ -95,7 +95,7 @@
 					"\n",
 					"print(f\"Archivo guardado exitosamente en: {output_path}\")"
 				],
-				"execution_count": null
+				"execution_count": 48
 			},
 			{
 				"cell_type": "markdown",
