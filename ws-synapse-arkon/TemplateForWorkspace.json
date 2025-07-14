@@ -711,7 +711,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "1",
 						"spark.dynamicAllocation.maxExecutors": "1",
-						"spark.autotune.trackingId": "57317612-e41b-426e-b5d6-7c50565dfc9c"
+						"spark.autotune.trackingId": "93ae44a1-6784-4f99-ab93-61d872937a0e"
 					}
 				},
 				"metadata": {
@@ -754,7 +754,7 @@
 							"# Obtener el secreto usando el Linked Service\n",
 							"try:\n",
 							"    db_password = mssparkutils.credentials.getSecret(akv_name, secret_key, linked_service_name)\n",
-							"    print(\"✅ Contraseña obtenida:\", db_password[:5] + \"*****\")\n",
+							"    print(\"✅ Contraseña obtenida: ÉXITO\")\n",
 							"except Exception as e:\n",
 							"    raise RuntimeError(f\"❌ Error obteniendo el secreto '{secret_key}': {e}\")"
 						],
@@ -791,7 +791,7 @@
 							"display(df.limit(20))"
 						],
 						"outputs": [],
-						"execution_count": 4
+						"execution_count": 2
 					},
 					{
 						"cell_type": "code",
@@ -830,7 +830,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "1",
 						"spark.dynamicAllocation.maxExecutors": "1",
-						"spark.autotune.trackingId": "9e81b19d-ee80-4f5d-bc2c-67a89b552a50"
+						"spark.autotune.trackingId": "741d9c5a-6343-426f-8973-fa9bae73af82"
 					}
 				},
 				"metadata": {
@@ -838,7 +838,7 @@
 					"enableDebugMode": false,
 					"kernelspec": {
 						"name": "synapse_pyspark",
-						"display_name": "python"
+						"display_name": "Synapse PySpark"
 					},
 					"language_info": {
 						"name": "python"
@@ -855,7 +855,8 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 15
 				},
@@ -904,7 +905,7 @@
 							"print(f\"Archivo guardado exitosamente en: {output_path}\")"
 						],
 						"outputs": [],
-						"execution_count": 48
+						"execution_count": null
 					},
 					{
 						"cell_type": "markdown",
@@ -991,6 +992,7 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"# Ruta en gold (directamente en la raíz)\n",
 							"gold_output_path = \"abfss://gold@blobstoragearkon.dfs.core.windows.net/gold_layer/workers_by_fullname.parquet\"\n",
@@ -1020,6 +1022,7 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"# 1. Ruta del archivo original\n",
 							"input_path = \"abfss://silver@blobstoragearkon.dfs.core.windows.net/silver_layer/workers_by_fullname.parquet\"\n",
@@ -1277,6 +1280,7 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							""
 						],
