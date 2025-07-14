@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "57317612-e41b-426e-b5d6-7c50565dfc9c"
+				"spark.autotune.trackingId": "93ae44a1-6784-4f99-ab93-61d872937a0e"
 			}
 		},
 		"metadata": {
@@ -64,7 +64,7 @@
 					"# Obtener el secreto usando el Linked Service\n",
 					"try:\n",
 					"    db_password = mssparkutils.credentials.getSecret(akv_name, secret_key, linked_service_name)\n",
-					"    print(\"✅ Contraseña obtenida:\", db_password[:5] + \"*****\")\n",
+					"    print(\"✅ Contraseña obtenida: ÉXITO\")\n",
 					"except Exception as e:\n",
 					"    raise RuntimeError(f\"❌ Error obteniendo el secreto '{secret_key}': {e}\")"
 				],
@@ -99,7 +99,7 @@
 					"\n",
 					"display(df.limit(20))"
 				],
-				"execution_count": 4
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",

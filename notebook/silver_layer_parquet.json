@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "9e81b19d-ee80-4f5d-bc2c-67a89b552a50"
+				"spark.autotune.trackingId": "db996a9b-c58b-43b0-8ded-054a85aa00d6"
 			}
 		},
 		"metadata": {
@@ -29,7 +29,7 @@
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",
-				"display_name": "python"
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "python"
@@ -95,7 +95,7 @@
 					"\n",
 					"print(f\"Archivo guardado exitosamente en: {output_path}\")"
 				],
-				"execution_count": 48
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
