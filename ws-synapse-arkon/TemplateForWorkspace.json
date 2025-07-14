@@ -422,7 +422,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "SELECT TOP 100 * FROM dbo.sql_workers_raw\nGo\n\nSELECT COUNT(*) AS total_filas FROM dbo.sql_workers_raw;\nGO\n\nSELECT \n    SUM(CASE WHEN first_name IS NULL OR first_name = '' THEN 1 ELSE 0 END) AS nulos_nombre,\n    SUM(CASE WHEN email IS NULL OR email = '' THEN 1 ELSE 0 END) AS nulos_email,\n    SUM(CASE WHEN phone1 IS NULL OR phone1 = '' THEN 1 ELSE 0 END) AS nulos_telefono\nFROM dbo.sql_workers_raw;\nGO",
+					"query": "SELECT TOP 100 * FROM dbo.sql_workers_raw\nGo\n\nSELECT COUNT(*) AS total_filas FROM dbo.sql_workers_raw;\nGO\n\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -619,7 +619,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "1",
 						"spark.dynamicAllocation.maxExecutors": "1",
-						"spark.autotune.trackingId": "2df685bf-aae6-4390-9ade-a703773bda5a"
+						"spark.autotune.trackingId": "ecbf6b74-9220-447a-b9d6-bc4e19c29c03"
 					}
 				},
 				"metadata": {
@@ -644,8 +644,7 @@
 						"sparkVersion": "3.4",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 15
 				},
@@ -781,7 +780,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"# Ruta en gold (directamente en la raíz)\n",
 							"gold_output_path = \"abfss://gold@blobstoragearkon.dfs.core.windows.net/gold_layer/workers_by_fullname.parquet\"\n",
@@ -811,7 +809,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"# 1. Ruta del archivo original\n",
 							"input_path = \"abfss://silver@blobstoragearkon.dfs.core.windows.net/silver_layer/workers_by_fullname.parquet\"\n",
@@ -1069,7 +1066,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							""
 						],
